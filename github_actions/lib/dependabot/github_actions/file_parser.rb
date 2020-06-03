@@ -3,9 +3,11 @@
 require "yaml"
 
 require "dependabot/dependency"
+require "dependabot/errors"
 require "dependabot/file_parsers"
 require "dependabot/file_parsers/base"
-require "dependabot/errors"
+require "dependabot/file_parsers/base/dependency_set"
+require "dependabot/github_actions/version"
 
 # For docs, see
 # https://help.github.com/en/articles/configuring-a-workflow#referencing-actions-in-your-workflow

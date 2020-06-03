@@ -12,21 +12,13 @@ RSpec.describe Dependabot::GithubActions::UpdateChecker do
     described_class.new(
       dependency: dependency,
       dependency_files: [],
-      credentials: credentials,
+      credentials: github_credentials,
       ignored_versions: ignored_versions,
       raise_on_ignored: raise_on_ignored
     )
   end
   let(:ignored_versions) { [] }
   let(:raise_on_ignored) { false }
-  let(:credentials) do
-    [{
-      "type" => "git_source",
-      "host" => "github.com",
-      "username" => "x-access-token",
-      "password" => "token"
-    }]
-  end
 
   let(:dependency) do
     Dependabot::Dependency.new(
@@ -315,6 +307,66 @@ RSpec.describe Dependabot::GithubActions::UpdateChecker do
 
         it { is_expected.to eq(expected_requirements) }
       end
+    end
+
+    context "with multiple requirement sources", :vcr do
+      let(:dependency) do
+        Dependabot::Dependency.new(
+          name: "actions/checkout",
+          version: nil,
+          package_manager: "github_actions",
+          requirements: [{
+            requirement: nil,
+            groups: [],
+            file: ".github/workflows/workflow.yml",
+            metadata: { declaration_string: "actions/checkout@v2.1.0" },
+            source: {
+              type: "git",
+              url: "https://github.com/actions/checkout",
+              ref: "v2.1.0",
+              branch: nil,
+            },
+          }, {
+            requirement: nil,
+            groups: [],
+            file: ".github/workflows/workflow.yml",
+            metadata: { declaration_string: "actions/checkout@master" },
+            source: {
+              type: "git",
+              url: "https://github.com/actions/checkout",
+              ref: "master",
+              branch: nil,
+            },
+          }],
+        )
+      end
+      let(:expected_requirements) do
+        [{
+          requirement: nil,
+          groups: [],
+          file: ".github/workflows/workflow.yml",
+          metadata: { declaration_string: "actions/checkout@v2.1.0" },
+          source: {
+            type: "git",
+            url: "https://github.com/actions/checkout",
+            ref: "v2.2.0",
+            branch: nil,
+          },
+        }, {
+          requirement: nil,
+          groups: [],
+          file: ".github/workflows/workflow.yml",
+          metadata: { declaration_string: "actions/checkout@master" },
+          source: {
+            type: "git",
+            url: "https://github.com/actions/checkout",
+            ref: "v2.2.0",
+            branch: nil,
+          },
+        }]
+      end
+
+      it { is_expected.to eq(expected_requirements) }
     end
   end
 end

@@ -15,5 +15,6 @@ Dependabot::PullRequestCreator::Labeler.
   register_label_details("go_modules", name: "go", colour: "16e2e2")
 
 require "dependabot/dependency"
+byebug
 Dependabot::Dependency.
   register_production_check("go_modules", ->(_) { true })
