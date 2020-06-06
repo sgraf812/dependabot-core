@@ -3,6 +3,7 @@
 source "https://rubygems.org"
 
 gem "dependabot-bundler", path: "../bundler"
+gem "dependabot-cabal", path: "../cabal"
 gem "dependabot-cargo", path: "../cargo"
 gem "dependabot-common", path: "../common"
 gem "dependabot-composer", path: "../composer"

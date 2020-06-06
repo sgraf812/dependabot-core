@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -122,6 +122,10 @@ docker run --rm -ti \
   -v "$(pwd)/cargo/dependabot-cargo.gemspec:$CODE_DIR/cargo/dependabot-core.gemspec" \
   -v "$(pwd)/cargo/lib:$CODE_DIR/cargo/lib" \
   -v "$(pwd)/cargo/spec:$CODE_DIR/cargo/spec" \
+  -v "$(pwd)/cabal/Gemfile:$CODE_DIR/cabal/Gemfile" \
+  -v "$(pwd)/cabal/dependabot-cabal.gemspec:$CODE_DIR/cabal/dependabot-core.gemspec" \
+  -v "$(pwd)/cabal/lib:$CODE_DIR/cabal/lib" \
+  -v "$(pwd)/cabal/spec:$CODE_DIR/cabal/spec" \
   -v "$(pwd)/dep/Gemfile:$CODE_DIR/dep/Gemfile" \
   -v "$(pwd)/dep/dependabot-dep.gemspec:$CODE_DIR/dep/dependabot-dep.gemspec" \
   -v "$(pwd)/dep/lib:$CODE_DIR/dep/lib" \
