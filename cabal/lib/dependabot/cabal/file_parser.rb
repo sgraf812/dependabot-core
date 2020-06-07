@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "toml-rb"
-
 require "dependabot/dependency"
 require "dependabot/file_parsers"
 require "dependabot/file_parsers/base"
@@ -18,102 +16,58 @@ module Dependabot
       # - fields (foo: blah) and
       # - sections (library bar\n  stuff: blarg)
       class GenericPackageDescription
-        # String -> Array[(String, (Field | Section))]
-        def self.parse(input)
-          GenericPackageDescription.parse_field_payload(Lexer.new(input))
+
+        # Parse the top-level `packages:` field.
+        # `String -> Array[String]`
+        def self.parse_packages_field(input)
+          m = @PACKAGES_PAYLOAD_REGEX.match(input)
+          # The field payload is a comma and space-separated list of packages
+          m[:payload].split(/[\s,]+/)
         end
 
-        def initialize
-          @nestings = [] # Array[{:offset, :}]
+        # Parse all `build-depends:` fields, regardless in which (sub-)sections
+        # they occur.
+        # `String -> Array[DependencySet]`
+        def self.parse_build_depends_field(input)
+          input.scan(@BUILD_DEPENDS_PAYLOAD_REGEX).map do |match|
+            # The build-depends payload is a (optionally space, but necessarily)
+            # comma-separated list of (library + version bound info).
+            match[:payload].split(",").map do |entry|
+              library_name, bounds = entry.split(/([a-zA-Z0-9\-]+)/, 2)[1..-1]
+              # Now we only need to make sense of the bounds...
+            end
+          end
         end
 
         private
 
-        class Token
-          @EOF = Token.new(type: "eof")
-          @OPEN_INDENT = Token.new(type: "open_indent")
-          @CLOSE_INDENT = Token.new(type: "close_indent")
+        @PACKAGES_PAYLOAD_REGEX = parse_field_payload_regex("packages").freeze
+        @VERSION_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
+        @BUILD_DEPENDS_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
 
-          def ==(other)
-            @type == other.type && @payload == other.payload
-          end
-
-          def self.new_word(payload)
-            Token.new(type: "word", payload: payload)
-          end
-
-          private
-
-          def initialize(type:, payload: nil)
-            @type = type
-            @payload = payload
-          end
+        def self.parse_field_payload_regex(field)
+          # This regex takes care of indentation sensitivity around fields
+          # in cabal.project and *.cabal files.
+          # The <payload> capture group is what we are after: Basically the
+          # contents of the field. It may spread over multiple lines, but every
+          # line after the first must lead with more space than what is matched
+          # by the <indent> capture group preceding the field declaration.
+          # We allow empty lines and lines with only whitespace in-between,
+          # though (the |[ \t]*) part), regardless of indentation.
+          %r{
+            (?<indent>[\ \t]*)#{field}: # Capture indentation of field declaration
+            (?<payload>
+              # Match the payload, consisting of
+              # (1) The rest of the line
+              [^\n]*
+              # (2) And a run of zero or more following lines, as long as
+              # (a) they are indented more than <indent> or (b) they consist
+              # of whitespace only.
+              (?:\n(?:\k<indent>[\ \t][^\n]+|[\ \t]*))*
+              )
+          }
         end
 
-        class Lexer
-          def initialize(input)
-            @next_tokens = []
-            @input = input
-            @i = 0
-            @after_new_line = true
-            @indents = []
-            advance()
-          end
-
-          def next_token()
-            return @next_tokens.first unless @next_tokens.empty?
-            advance()
-            @next_token.first
-          end
-
-          def cur()
-            @input[@i]
-          end
-
-          def advance()
-            return @next_token.shift unless @next_token.empty?
-
-            while cur == '\n'
-              @after_new_line = true
-              @i += 1
-            end
-
-            offset = 0
-            while cur == ' ' || cur == '\t'
-              if cur == '\t' then
-                # tab = 8 spaces because of https://github.com/haskell/cabal/blob/0046cf2dbde006320547ab26c3a17e5f009bc616/Cabal/Distribution/Fields/Lexer.hs#L73
-                offset += 8
-              else
-                offset += 1
-              end
-                @i += 1
-            end
-
-            # ignore empty lines
-            return advance if cur == '\n'
-
-            if @after_new_line then
-              while @indents[-1] <= offset
-                @indents.pop
-                @next_tokens << Token.CLOSE_INDENT
-              end
-              @after_new_line = false
-            end
-
-            start = @i
-            @i += 1 while !cur.start_with?(" ", "\t", "\n")
-            payload = @input[@start..(@i-1)]
-            next_tokens << Token.new_word(payload)
-          end
-        end
-
-        # (Integer, [Token]) -> Array[(String, (Field | Section))]
-        # []
-        def parse_field_payload(lexer)
-          case lexer.next_token.type
-          when
-          end
-        end
       end
 
       class FileParser < Dependabot::FileParsers::Base
@@ -123,11 +77,9 @@ module Dependabot
           %w(dependencies dev-dependencies build-dependencies).freeze
 
         def parse
-          check_rust_workspace_root
-
           dependency_set = DependencySet.new
           dependency_set += manifest_dependencies
-          dependency_set += lockfile_dependencies if lockfile
+          dependency_set += freeze_file_dependencies if freeze_file
 
           dependencies = dependency_set.dependencies
 
@@ -143,21 +95,6 @@ module Dependabot
 
         private
 
-        def check_rust_workspace_root
-          cabal_project = dependency_files.find { |f| f.name == "cabal.project" }
-          workspace_root = parsed_file(cabal_project).dig("package", "workspace")
-          return unless workspace_root
-
-          msg = "This project is part of a Rust workspace but is not the "\
-                "workspace root."\
-
-          if cabal_project.directory != "/"
-            msg += "Please update your settings so Dependabot points at the "\
-                  "workspace root instead of #{cabal_project.directory}."
-          end
-          raise Dependabot::DependencyFileNotEvaluatable, msg
-        end
-
         def manifest_dependencies
           dependency_set = DependencySet.new
 
@@ -165,7 +102,7 @@ module Dependabot
             DEPENDENCY_TYPES.each do |type|
               parsed_file(file).fetch(type, {}).each do |name, requirement|
                 next unless name == name_from_declaration(name, requirement)
-                next if lockfile && !version_from_lockfile(name, requirement)
+                next if freeze_file && !version_from_freeze_file(name, requirement)
 
                 dependency_set << build_dependency(name, requirement, type, file)
               end
@@ -173,7 +110,7 @@ module Dependabot
               parsed_file(file).fetch("target", {}).each do |_, t_details|
                 t_details.fetch(type, {}).each do |name, requirement|
                   next unless name == name_from_declaration(name, requirement)
-                  next if lockfile && !version_from_lockfile(name, requirement)
+                  next if freeze_file && !version_from_freeze_file(name, requirement)
 
                   dependency_set <<
                     build_dependency(name, requirement, type, file)
@@ -188,7 +125,7 @@ module Dependabot
         def build_dependency(name, requirement, type, file)
           Dependency.new(
             name: name,
-            version: version_from_lockfile(name, requirement),
+            version: version_from_freeze_file(name, requirement),
             package_manager: "cabal",
             requirements: [{
               requirement: requirement_from_declaration(requirement),
@@ -199,18 +136,18 @@ module Dependabot
           )
         end
 
-        def lockfile_dependencies
+        def freeze_file_dependencies
           dependency_set = DependencySet.new
-          return dependency_set unless lockfile
+          return dependency_set unless freeze_file
 
-          parsed_file(lockfile).fetch("package", []).each do |package_details|
+          parsed_file(freeze_file).fetch("package", []).each do |package_details|
             next unless package_details["source"]
 
             # TODO: This isn't quite right, as it will only give us one
             # version of each dependency (when in fact there are many)
             dependency_set << Dependency.new(
               name: package_details["name"],
-              version: version_from_lockfile_details(package_details),
+              version: version_from_freeze_file_details(package_details),
               package_manager: "cabal",
               requirements: []
             )
@@ -259,11 +196,11 @@ module Dependabot
           return { type: "path" } if declaration["path"]
         end
 
-        def version_from_lockfile(name, declaration)
-          return unless lockfile
+        def version_from_freeze_file(name, declaration)
+          return unless freeze_file
 
           candidate_packages =
-            parsed_file(lockfile).fetch("package", []).
+            parsed_file(freeze_file).fetch("package", []).
             select { |p| p["name"] == name }
 
           if (req = requirement_from_declaration(declaration))
@@ -286,7 +223,7 @@ module Dependabot
 
           return unless package
 
-          version_from_lockfile_details(package)
+          version_from_freeze_file_details(package)
         end
 
         def git_req?(declaration)
@@ -302,7 +239,7 @@ module Dependabot
           }
         end
 
-        def version_from_lockfile_details(package_details)
+        def version_from_freeze_file_details(package_details)
           unless package_details["source"]&.start_with?("git+")
             return package_details["version"]
           end
@@ -311,25 +248,41 @@ module Dependabot
         end
 
         def check_required_files
-          raise "No cabal.project!" unless get_original_file("cabal.project")
+          project_file = get_original_file("cabal.project")
+          invalid_cabal_files =
+            cabal_files.
+              select { |f| !parse_cabal_file(f) }.
+              map { |f| f.name }
+          raise "No cabal.project or *.cabal file found."
+            if !project_file && cabal_files.empty?
+          raise "Could not find any cabal files listed in cabal.project."
+            if  project_file && cabal_files.empty?
+          raise "Could not parse packages field of cabal.project file."
+            if  project_file && !parse_project_file(project_file)
+          raise "Could not parse build-depends field of #{invalid_cabal_files}"
+            if !invalid_cabal_files.empty?
+          raise "Could not parse constraints field of #{freeze_file.name}"
+            if !parse_freeze_file(freeze_file)
         end
 
-        def parsed_file(file)
-          @parsed_file ||= {}
-          @parsed_file[file.name] ||= TomlRB.parse(file.content)
-        rescue TomlRB::ParseError, TomlRB::ValueOverwriteError
-          raise Dependabot::DependencyFileNotParseable, file.path
+        def parse_project_file(file)
+          @parse_project_file ||=
+            GenericPackageDescription.parse_packages_field(file.content)
         end
 
-        def manifest_files
-          @manifest_files ||=
-            dependency_files.
-            select { |f| f.name.end_with?("cabal.project") }.
-            reject(&:support_file?)
+        # TODO: Maybe do the same with build-tool-depends?
+        def parse_cabal_file(file)
+          @parse_cabal_file ||=
+            GenericPackageDescription.parse_build_depends_field(file.content)
         end
 
-        def lockfile
-          @lockfile ||= get_original_file("cabal.config")
+        def cabal_files
+          @cabal_files ||=
+            dependency_files.select { |f| f.name.end_with?(".cabal") }
+        end
+
+        def freeze_file
+          @freeze_file ||= get_original_file("cabal.project.freeze")
         end
 
         def version_class
