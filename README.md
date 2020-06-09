@@ -1,3 +1,15 @@
+# Notes for ZuriHackers
+
+Look at the issues for open TODOs, they are labelled as such.
+
+The FileFetcher (see below for the four stages to implement) is already
+implemented, but untested and un-type-checked. I'm not a Rubyist myself,
+so no guarantees on idioms or even syntactically correct programs. I
+don't even have a clue of how to run the testsuite yet or how to test my
+changes. Don't worry, we'll iron this out!
+
+----
+
 <p align="center">
   <img src="https://s3.eu-west-2.amazonaws.com/dependabot-images/logo-with-name-horizontal.svg?v5" alt="Dependabot" width="336">
 </p>
