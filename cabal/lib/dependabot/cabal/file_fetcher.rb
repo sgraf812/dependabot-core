@@ -58,9 +58,9 @@ module Dependabot
 
       # Seems reasonable to expect 100_000 as max file size, see python
       def text_file?(file, max_size = 100_000)
-        file.type == "file"
-          && file.size < 100_000
-          && file.content.valid_encoding?
+        file.type == "file" &&
+        file.size < 100_000 &&
+        file.content.valid_encoding?
       end
 
       def cabal_file?(file)
@@ -103,6 +103,7 @@ module Dependabot
       def cabal_project_freeze_file
         @cabal_project_freeze_file ||= fetch_file_from_host("cabal.project.freeze")
       end
+    end
   end
 end
 

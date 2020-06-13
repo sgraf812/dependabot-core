@@ -253,16 +253,16 @@ module Dependabot
             cabal_files.
               select { |f| !parse_cabal_file(f) }.
               map { |f| f.name }
-          raise "No cabal.project or *.cabal file found."
-            if !project_file && cabal_files.empty?
-          raise "Could not find any cabal files listed in cabal.project."
-            if  project_file && cabal_files.empty?
-          raise "Could not parse packages field of cabal.project file."
-            if  project_file && !parse_project_file(project_file)
-          raise "Could not parse build-depends field of #{invalid_cabal_files}"
-            if !invalid_cabal_files.empty?
-          raise "Could not parse constraints field of #{freeze_file.name}"
-            if !parse_freeze_file(freeze_file)
+          raise "No cabal.project or *.cabal file found." if
+            !project_file && cabal_files.empty?
+          raise "Could not find any cabal files listed in cabal.project." if
+            project_file && cabal_files.empty?
+          raise "Could not parse packages field of cabal.project file." if
+            project_file && !parse_project_file(project_file)
+          raise "Could not parse build-depends field of #{invalid_cabal_files}" if
+            !invalid_cabal_files.empty?
+          raise "Could not parse constraints field of #{freeze_file.name}" if
+            !parse_freeze_file(freeze_file)
         end
 
         def parse_project_file(file)
