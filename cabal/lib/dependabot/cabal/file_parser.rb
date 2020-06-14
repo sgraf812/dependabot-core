@@ -40,11 +40,6 @@ module Dependabot
         end
 
         private
-
-        @PACKAGES_PAYLOAD_REGEX = parse_field_payload_regex("packages").freeze
-        @VERSION_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
-        @BUILD_DEPENDS_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
-
         def self.parse_field_payload_regex(field)
           # This regex takes care of indentation sensitivity around fields
           # in cabal.project and *.cabal files.
@@ -68,12 +63,15 @@ module Dependabot
           }
         end
 
+        @@PACKAGES_PAYLOAD_REGEX = parse_field_payload_regex("packages").freeze
+        @@VERSION_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
+        @@BUILD_DEPENDS_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
       end
 
       class FileParser < Dependabot::FileParsers::Base
         require "dependabot/file_parsers/base/dependency_set"
 
-        DEPENDENCY_TYPES =
+        @@DEPENDENCY_TYPES =
           %w(dependencies dev-dependencies build-dependencies).freeze
 
         def parse
@@ -293,4 +291,4 @@ module Dependabot
   end
 end
 
-Dependabot::FileParsers.register("cabal", Dependabot::Cabal::FileParser)
+Dependabot::FileParsers.register("cabal", Dependabot::Haskell::Cabal::FileParser)
