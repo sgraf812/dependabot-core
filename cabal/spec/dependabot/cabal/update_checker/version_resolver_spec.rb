@@ -39,7 +39,7 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::VersionResolver do
   end
   let(:lockfile) do
     Dependabot::DependencyFile.new(
-      name: "cabal.config",
+      name: "cabal.project.freeze",
       content: fixture("lockfiles", lockfile_fixture_name)
     )
   end

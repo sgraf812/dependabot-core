@@ -35,7 +35,7 @@ module Dependabot
               run_shell_command("cabal update -p #{dependency_spec}")
             end
 
-            updated_lockfile = File.read("cabal.config")
+            updated_lockfile = File.read("cabal.project.freeze")
             updated_lockfile = post_process_lockfile(updated_lockfile)
 
             if updated_lockfile.include?(desired_lockfile_content)
@@ -360,7 +360,7 @@ module Dependabot
         end
 
         def lockfile
-          @lockfile ||= dependency_files.find { |f| f.name == "cabal.config" }
+          @lockfile ||= dependency_files.find { |f| f.name == "cabal.project.freeze" }
         end
 
         def toolchain

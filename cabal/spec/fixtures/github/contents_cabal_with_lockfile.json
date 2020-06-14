@@ -176,19 +176,19 @@
     }
   },
   {
-    "name": "cabal.config",
-    "path": "cabal.config",
+    "name": "cabal.project.freeze",
+    "path": "cabal.project.freeze",
     "sha": "d2e6686dd9c81bbe78cef2a300b443acf96c93e9",
     "size": 47368,
-    "url": "https://api.github.com/repos/runconduit/conduit/contents/cabal.config?ref=master",
-    "html_url": "https://github.com/runconduit/conduit/blob/master/cabal.config",
+    "url": "https://api.github.com/repos/runconduit/conduit/contents/cabal.project.freeze?ref=master",
+    "html_url": "https://github.com/runconduit/conduit/blob/master/cabal.project.freeze",
     "git_url": "https://api.github.com/repos/runconduit/conduit/git/blobs/d2e6686dd9c81bbe78cef2a300b443acf96c93e9",
-    "download_url": "https://raw.githubusercontent.com/runconduit/conduit/master/cabal.config",
+    "download_url": "https://raw.githubusercontent.com/runconduit/conduit/master/cabal.project.freeze",
     "type": "file",
     "_links": {
-      "self": "https://api.github.com/repos/runconduit/conduit/contents/cabal.config?ref=master",
+      "self": "https://api.github.com/repos/runconduit/conduit/contents/cabal.project.freeze?ref=master",
       "git": "https://api.github.com/repos/runconduit/conduit/git/blobs/d2e6686dd9c81bbe78cef2a300b443acf96c93e9",
-      "html": "https://github.com/runconduit/conduit/blob/master/cabal.config"
+      "html": "https://github.com/runconduit/conduit/blob/master/cabal.project.freeze"
     }
   },
   {

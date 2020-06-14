@@ -22,7 +22,7 @@ RSpec.describe Dependabot::Cabal::FileUpdater::LockfileUpdater do
     Dependabot::DependencyFile.new(name: "cabal.project", content: manifest_body)
   end
   let(:lockfile) do
-    Dependabot::DependencyFile.new(name: "cabal.config", content: lockfile_body)
+    Dependabot::DependencyFile.new(name: "cabal.project.freeze", content: lockfile_body)
   end
   let(:manifest_body) { fixture("manifests", manifest_fixture_name) }
   let(:lockfile_body) { fixture("lockfiles", lockfile_fixture_name) }

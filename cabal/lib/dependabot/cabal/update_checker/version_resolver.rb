@@ -59,8 +59,8 @@ module Dependabot
         end
 
         def fetch_version_from_new_lockfile
-          check_rust_workspace_root unless File.exist?("cabal.config")
-          lockfile_content = File.read("cabal.config")
+          check_rust_workspace_root unless File.exist?("cabal.project.freeze")
+          lockfile_content = File.read("cabal.project.freeze")
           versions = TomlRB.parse(lockfile_content).fetch("package").
                      select { |p| p["name"] == dependency.name }
 
@@ -399,7 +399,7 @@ module Dependabot
 
         def lockfile
           @lockfile ||= prepared_dependency_files.
-                        find { |f| f.name == "cabal.config" }
+                        find { |f| f.name == "cabal.project.freeze" }
         end
 
         def toolchain

@@ -38,7 +38,7 @@ RSpec.describe Dependabot::Cabal::FileFetcher do
         headers: json_header
       )
 
-    stub_request(:get, url + "cabal.config?ref=sha").
+    stub_request(:get, url + "cabal.project.freeze?ref=sha").
       with(headers: { "Authorization" => "token token" }).
       to_return(
         status: 200,
@@ -58,9 +58,9 @@ RSpec.describe Dependabot::Cabal::FileFetcher do
         )
     end
 
-    it "fetches the cabal.project and cabal.config" do
+    it "fetches the cabal.project and cabal.project.freeze" do
       expect(file_fetcher_instance.files.map(&:name)).
-        to match_array(%w(cabal.config cabal.project))
+        to match_array(%w(cabal.project.freeze cabal.project))
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe Dependabot::Cabal::FileFetcher do
           body: fixture("github", "contents_cabal_without_lockfile.json"),
           headers: json_header
         )
-      stub_request(:get, url + "cabal.config?ref=sha").
+      stub_request(:get, url + "cabal.project.freeze?ref=sha").
         with(headers: { "Authorization" => "token token" }).
         to_return(status: 404, headers: json_header)
     end

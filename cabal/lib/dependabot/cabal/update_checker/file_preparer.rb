@@ -270,7 +270,7 @@ module Dependabot
         end
 
         def lockfile
-          @lockfile ||= dependency_files.find { |f| f.name == "cabal.config" }
+          @lockfile ||= dependency_files.find { |f| f.name == "cabal.project.freeze" }
         end
 
         def toolchain

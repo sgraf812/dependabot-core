@@ -74,7 +74,7 @@ module Dependabot
       end
 
       def lockfile
-        @lockfile ||= get_original_file("cabal.config")
+        @lockfile ||= get_original_file("cabal.project.freeze")
       end
     end
   end

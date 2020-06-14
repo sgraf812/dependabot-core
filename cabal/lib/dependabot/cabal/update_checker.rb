@@ -100,7 +100,7 @@ module Dependabot
       def library?
         # If it has a lockfile, treat it as an application. Otherwise treat it
         # as a library.
-        dependency_files.none? { |f| f.name == "cabal.config" }
+        dependency_files.none? { |f| f.name == "cabal.project.freeze" }
       end
 
       def latest_version_finder

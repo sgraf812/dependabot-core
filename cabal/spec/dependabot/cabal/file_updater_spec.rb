@@ -28,7 +28,7 @@ RSpec.describe Dependabot::Cabal::FileUpdater do
     Dependabot::DependencyFile.new(name: "cabal.project", content: manifest_body)
   end
   let(:lockfile) do
-    Dependabot::DependencyFile.new(name: "cabal.config", content: lockfile_body)
+    Dependabot::DependencyFile.new(name: "cabal.project.freeze", content: lockfile_body)
   end
   let(:manifest_body) { fixture("manifests", manifest_fixture_name) }
   let(:lockfile_body) { fixture("lockfiles", lockfile_fixture_name) }
@@ -113,7 +113,7 @@ RSpec.describe Dependabot::Cabal::FileUpdater do
     context "with a lockfile" do
       describe "the updated lockfile" do
         subject(:updated_lockfile_content) do
-          updated_files.find { |f| f.name == "cabal.config" }.content
+          updated_files.find { |f| f.name == "cabal.project.freeze" }.content
         end
 
         it "updates the dependency version in the lockfile" do

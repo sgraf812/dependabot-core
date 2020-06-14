@@ -28,7 +28,7 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::FilePreparer do
   end
   let(:lockfile) do
     Dependabot::DependencyFile.new(
-      name: "cabal.config",
+      name: "cabal.project.freeze",
       content: fixture("lockfiles", lockfile_fixture_name)
     )
   end
@@ -288,7 +288,7 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::FilePreparer do
     end
 
     describe "the updated lockfile" do
-      subject { prepared_dependency_files.find { |f| f.name == "cabal.config" } }
+      subject { prepared_dependency_files.find { |f| f.name == "cabal.project.freeze" } }
       it { is_expected.to eq(lockfile) }
     end
 

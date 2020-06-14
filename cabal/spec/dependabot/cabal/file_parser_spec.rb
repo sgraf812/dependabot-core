@@ -27,7 +27,7 @@ RSpec.describe Dependabot::Cabal::FileParser do
   end
   let(:lockfile) do
     Dependabot::DependencyFile.new(
-      name: "cabal.config",
+      name: "cabal.project.freeze",
       content: fixture("lockfiles", lockfile_fixture_name)
     )
   end
@@ -785,7 +785,7 @@ RSpec.describe Dependabot::Cabal::FileParser do
         it "raises a DependencyFileNotParseable error" do
           expect { parser.parse }.
             to raise_error(Dependabot::DependencyFileNotParseable) do |error|
-              expect(error.file_name).to eq("cabal.config")
+              expect(error.file_name).to eq("cabal.project.freeze")
             end
         end
       end

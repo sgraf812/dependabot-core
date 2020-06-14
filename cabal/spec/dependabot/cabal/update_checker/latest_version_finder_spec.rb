@@ -42,7 +42,7 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::LatestVersionFinder do
         content: fixture("manifests", manifest_fixture_name)
       ),
       Dependabot::DependencyFile.new(
-        name: "cabal.config",
+        name: "cabal.project.freeze",
         content: fixture("lockfiles", lockfile_fixture_name)
       )
     ]
