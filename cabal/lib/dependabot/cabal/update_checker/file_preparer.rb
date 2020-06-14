@@ -67,7 +67,7 @@ module Dependabot
         def replace_version_constraint(content, filename)
           parsed_manifest = TomlRB.parse(content)
 
-          Cabal::Haskell::FileParser::DEPENDENCY_TYPES.each do |type|
+          Cabal::FileParser::DEPENDENCY_TYPES.each do |type|
             dependency_names_for_type(parsed_manifest, type).each do |name|
               req = parsed_manifest.dig(type, name)
 
@@ -88,7 +88,7 @@ module Dependabot
 
         def replace_req_on_target_specific_deps!(parsed_manifest, filename)
           parsed_manifest.fetch("target", {}).each do |target, _|
-            Haskell::Cabal::FileParser::DEPENDENCY_TYPES.each do |type|
+            Cabal::FileParser::DEPENDENCY_TYPES.each do |type|
               dependency_names = dependency_names_for_type_and_target(
                 parsed_manifest,
                 type,

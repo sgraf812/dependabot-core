@@ -6,7 +6,7 @@ require "dependabot/dependency_file"
 require "dependabot/source"
 require_common_spec "file_parsers/shared_examples_for_file_parsers"
 
-RSpec.describe Dependabot::Haskell::Cabal::FileParser do
+RSpec.describe Dependabot::Cabal::FileParser do
   it_behaves_like "a dependency file parser"
 
   let(:parser) { described_class.new(dependency_files: files, source: source) }
