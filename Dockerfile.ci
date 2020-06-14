@@ -89,6 +89,12 @@ COPY cargo/Gemfile \
      /home/dependabot/dependabot-core/cargo/
 RUN cd cargo && bundle install
 
+RUN mkdir -p /home/dependabot/dependabot-core/cabalc
+COPY cabal/Gemfile \
+     cabal/dependabot-cabal.gemspec \
+     /home/dependabot/dependabot-core/cabal/
+RUN cd cabal && bundle install
+
 RUN mkdir -p /home/dependabot/dependabot-core/dep
 COPY dep/Gemfile \
      dep/dependabot-dep.gemspec \

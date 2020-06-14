@@ -107,4 +107,4 @@ module Dependabot
   end
 end
 
-Dependabot::FileFetchers.register("Cabal", Dependabot::Cabal::FileFetcher)
+Dependabot::FileFetchers.register("cabal", Dependabot::Cabal::FileFetcher)

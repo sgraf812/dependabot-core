@@ -39,6 +39,7 @@ module Dependabot
       end
 
       private
+
       def self.parse_field_payload_regex(field)
         # This regex takes care of indentation sensitivity around fields
         # in cabal.project and *.cabal files.

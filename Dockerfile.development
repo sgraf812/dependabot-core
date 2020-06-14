@@ -41,6 +41,7 @@ COPY common/lib/dependabot/version.rb ${CODE_DIR}/common/lib/dependabot/
 RUN cd common && bundle install
 
 RUN mkdir -p ${CODE_DIR}/bundler \
+             ${CODE_DIR}/cabal \
              ${CODE_DIR}/cargo \
              ${CODE_DIR}/composer \
              ${CODE_DIR}/dep \
@@ -59,6 +60,7 @@ RUN mkdir -p ${CODE_DIR}/bundler \
              ${CODE_DIR}/terraform
 
 COPY bundler/Gemfile bundler/dependabot-bundler.gemspec ${CODE_DIR}/bundler/
+COPY cabal/Gemfile cabal/dependabot-cabal.gemspec ${CODE_DIR}/cabal/
 COPY cargo/Gemfile cargo/dependabot-cargo.gemspec ${CODE_DIR}/cargo/
 COPY composer/Gemfile composer/dependabot-composer.gemspec ${CODE_DIR}/composer/
 COPY dep/Gemfile dep/dependabot-dep.gemspec ${CODE_DIR}/dep/
