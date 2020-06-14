@@ -91,7 +91,7 @@ module Dependabot
       def fetch_multi_package_project(project_file)
         GenericPackageDescription.
           parse_packages_field(project_file.content).
-          flat_map { |f| expand_path(paths) }
+          flat_map { |f| expand_path(f) }
       end
 
       def cabal_project_file

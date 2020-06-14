@@ -42,7 +42,7 @@ RSpec.describe Dependabot::Cabal::FileFetcher do
       with(headers: { "Authorization" => "token token" }).
       to_return(
         status: 200,
-        body: fixture("github", "contents_cabal_configfile.json"),
+        body: fixture("github", "contents_cabal_lockfile.json"),
         headers: json_header
       )
   end
@@ -98,7 +98,7 @@ RSpec.describe Dependabot::Cabal::FileFetcher do
         with(headers: { "Authorization" => "token token" }).
         to_return(
           status: 200,
-          body: fixture("github", "contents_cabal_configfile.json"),
+          body: fixture("github", "contents_cabal_lockfile.json"),
           headers: json_header
         )
     end
