@@ -21,7 +21,7 @@ module Dependabot
       def self.parse_packages_field(input)
         m = @PACKAGES_PAYLOAD_REGEX.match(input)
         # The field payload is a comma and space-separated list of packages
-        m[:payload].split(/[\s,]+/)
+        m[:payload].split(/[\s,]+/) if m
       end
 
       # Parse all `build-depends:` fields, regardless in which (sub-)sections
