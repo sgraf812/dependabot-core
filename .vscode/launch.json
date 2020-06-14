@@ -15,6 +15,18 @@
         "${input:package_manager}",
         "${input:repository}"
       ]
+    },
+    {
+      "name": "Debug dry run pomaps",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceRoot}/bin/dry-run.rb",
+      "cwd": "${workspaceRoot}",
+      "useBundler": true,
+      "args": [
+        "cabal",
+        "sgraf812/pomaps"
+      ]
     }
   ],
   "inputs": [
