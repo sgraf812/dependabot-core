@@ -63,15 +63,15 @@ module Dependabot
         }
       end
 
-      @@PACKAGES_PAYLOAD_REGEX = parse_field_payload_regex("packages").freeze
-      @@VERSION_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
-      @@BUILD_DEPENDS_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
+      @PACKAGES_PAYLOAD_REGEX = parse_field_payload_regex("packages").freeze
+      @VERSION_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
+      @BUILD_DEPENDS_PAYLOAD_REGEX = parse_field_payload_regex("build-depends").freeze
     end
 
     class FileParser < Dependabot::FileParsers::Base
       require "dependabot/file_parsers/base/dependency_set"
 
-      @@DEPENDENCY_TYPES =
+      @DEPENDENCY_TYPES =
         %w(dependencies dev-dependencies build-dependencies).freeze
 
       def parse

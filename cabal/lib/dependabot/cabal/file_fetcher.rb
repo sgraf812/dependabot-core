@@ -30,10 +30,10 @@ module Dependabot
         if cabal_project_file then
           # v2 style, possibly multiple packages with own cabal files
           fetched_files << cabal_project_file
-          fetched_files << fetch_multi_package_project(cabal_project_file)
+          fetched_files += fetch_multi_package_project(cabal_project_file)
         else
           # simple project without cabal.project file, defaulting to ./*.cabal glob
-          fetched_files << fetch_simple_project
+          fetched_files += fetch_simple_project
         end
         fetched_files << cabal_project_freeze_file if cabal_project_freeze_file
         fetched_files.uniq
@@ -59,8 +59,7 @@ module Dependabot
       # Seems reasonable to expect 100_000 as max file size, see python
       def text_file?(file, max_size = 100_000)
         file.type == "file" &&
-        file.size < 100_000 &&
-        file.content.valid_encoding?
+        file.size < max_size
       end
 
       def cabal_file?(file)
@@ -96,12 +95,12 @@ module Dependabot
       end
 
       def cabal_project_file
-        @cabal_project_file ||= fetch_file_from_host("cabal.project")
+        @cabal_project_file ||= fetch_file_if_present("cabal.project")
       end
 
       # Freeze files, as produced by cabal v2-freeze.
       def cabal_project_freeze_file
-        @cabal_project_freeze_file ||= fetch_file_from_host("cabal.project.freeze")
+        @cabal_project_freeze_file ||= fetch_file_if_present("cabal.project.freeze")
       end
     end
   end
