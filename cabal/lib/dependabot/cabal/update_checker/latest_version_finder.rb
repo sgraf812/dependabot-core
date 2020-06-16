@@ -74,23 +74,22 @@ module Dependabot
         end
 
         def available_versions
-          crates_listing.
-            fetch("versions", []).
-            reject { |v| v["yanked"] }.
-            map { |v| version_class.new(v.fetch("num")) }
+          hackage_listing.
+            fetch("normal-version", []).
+            map { |v| version_class.new(v) }
         end
 
-        def crates_listing
-          return @crates_listing unless @crates_listing.nil?
+        def hackage_listing
+          return @hackage_listing unless @hackage_listing.nil?
 
           response = Excon.get(
-            "https://crates.io/api/v1/crates/#{dependency.name}",
+            "https://hackage.haskell.org/package/#{dependency.name}/preferred.json",
             idempotent: true,
             headers: { "User-Agent" => "Dependabot (dependabot.com)" },
             **SharedHelpers.excon_defaults
           )
 
-          @crates_listing = JSON.parse(response.body)
+          @hackage_listing = JSON.parse(response.body)
         rescue Excon::Error::Timeout
           retrying ||= false
           raise if retrying
