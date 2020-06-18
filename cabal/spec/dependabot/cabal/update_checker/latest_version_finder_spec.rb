@@ -131,40 +131,51 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::LatestVersionFinder do
     #end
   end
 
-  #describe "#lowest_security_fix_version" do
-  #  subject { finder.lowest_security_fix_version }
+  describe "#lowest_security_fix_version" do
+    subject { finder.lowest_security_fix_version }
 
-  #  let(:dependency_name) { "time" }
-  #  let(:dependency_version) { "0.1.12" }
-  #  let(:security_advisories) do
-  #    [
-  #      Dependabot::SecurityAdvisory.new(
-  #        dependency_name: dependency_name,
-  #        package_manager: "cabal",
-  #        vulnerable_versions: ["<= 0.1.18"]
-  #      )
-  #    ]
-  #  end
-  #  it { is_expected.to eq(Gem::Version.new("0.1.19")) }
+    let(:dependency_name) { "containers" }
+    let(:dependency_version) { "0.5.9.1" }
 
-  #  context "when the lowest version is being ignored" do
-  #    let(:ignored_versions) { [">= 0.1.18, < 0.1.20"] }
-  #    it { is_expected.to eq(Gem::Version.new("0.1.20")) }
-  #  end
+    context "when there is a security advisory" do
+      let(:security_advisories) do
+        [
+          Dependabot::SecurityAdvisory.new(
+            dependency_name: dependency_name,
+            package_manager: "cabal",
+            vulnerable_versions: ["<= 0.5.10.0"]
+          )
+        ]
+      end
+      it { is_expected.to eq(Gem::Version.new("0.5.10.1")) }
+    end
+    
+    context "when the version is specified as deprecated on hackage" do
+      it { is_expected.to eq(Gem::Version.new("0.5.9.2")) }
+    end
 
-  #  context "when all versions are being ignored" do
-  #    let(:ignored_versions) { [">= 0"] }
-  #    it "returns nil" do
-  #      expect(subject).to be_nil
-  #    end
+    context "when the lowest version is being ignored" do
+      let(:ignored_versions) { [">= 0.5.9.2, < 0.6.1.1"] }
+      it { is_expected.to eq(Gem::Version.new("0.6.1.1")) }
+    end
 
-  #    context "raise_on_ignored" do
-  #      let(:raise_on_ignored) { true }
-  #      it "raises an error" do
-  #        expect { subject }.to raise_error(Dependabot::AllVersionsIgnored)
-  #      end
-  #    end
-  #  end
+    context "when all versions are being ignored" do
+      let(:ignored_versions) { [">= 0"] }
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+
+      context "raise_on_ignored" do
+        let(:raise_on_ignored) { true }
+        it "raises an error" do
+          expect { subject }.to raise_error(Dependabot::AllVersionsIgnored)
+        end
+      end
+    end
+  end
+end
+
+
 
   #  context "when the lowest fixed version is a pre-release" do
   #    let(:dependency_name) { "xdg" }
@@ -199,5 +210,3 @@ RSpec.describe Dependabot::Cabal::UpdateChecker::LatestVersionFinder do
   #      end
   #    end
   #  end
-  #end
-end
